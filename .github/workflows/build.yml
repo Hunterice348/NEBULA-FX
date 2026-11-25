@@ -1,0 +1,37 @@
+name: NEBULA FX Build
+
+on:
+  push:
+    branches: [ "main" ]
+  workflow_dispatch:
+
+jobs:
+  build-windows:
+    name: Windows VST3
+    runs-on: windows-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup MSVC
+        uses: ilammy/msvc-dev-cmd@v1
+        with:
+          arch: x64
+
+      - name: Configure CMake
+        run: cmake -S . -B build -G "Visual Studio 17 2022" -A x64
+
+      - name: Build Release
+        run: cmake --build build --config Release --parallel 2
+
+      - name: Collect Artifact
+        run: |
+          New-Item -ItemType Directory -Force "package/VST3"
+          Copy-Item -Path "build/NEBULA_FX_artefacts/Release/VST3/NEBULA FX.vst3" -Destination "package/VST3/" -Recurse -Force
+
+      - name: Upload
+        uses: actions/upload-artifact@v4
+        with:
+          name: NEBULA-FX-Windows-VST3
+          path: package/
+          retention-days: 14

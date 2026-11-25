@@ -3,8 +3,14 @@ project(NEBULA_FX VERSION 1.0.0 LANGUAGES CXX)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_EXTENSIONS OFF)
 
 include(FetchContent)
+
+# Отключаем лишнее для ускорения и стабильности сборки
+set(JUCE_BUILD_EXTRAS OFF CACHE BOOL "" FORCE)
+set(JUCE_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
+
 FetchContent_Declare(JUCE
     GIT_REPOSITORY https://github.com/juce-framework/JUCE.git
     GIT_TAG 8.0.6
@@ -27,7 +33,9 @@ juce_add_plugin(NEBULA_FX
     COPY_PLUGIN_AFTER_BUILD TRUE
 )
 
-target_sources(NEBULA_FX PRIVATE Source/Plugin.cpp)
+target_sources(NEBULA_FX PRIVATE 
+    Source/Plugin.cpp
+)
 
 target_link_libraries(NEBULA_FX PRIVATE
     juce::juce_audio_utils

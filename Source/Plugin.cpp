@@ -6,8 +6,7 @@ public:
         .withInput("In", juce::AudioChannelSet::stereo(), true)
         .withOutput("Out", juce::AudioChannelSet::stereo(), true)),
         apvts(*this, nullptr, "Params", {
-            std::make_unique<juce::AudioParameterFloat>("GAIN", "Gain", -48.0f, 24.0f, 0.0f),
-            std::make_unique<juce::AudioParameterFloat>("MIX", "Mix", 0.0f, 100.0f, 100.0f)
+            std::make_unique<juce::AudioParameterFloat>("GAIN", "Gain", -48.0f, 24.0f, 0.0f)
         }) {}
     ~NebulaFXAudioProcessor() override {}
 
@@ -35,6 +34,8 @@ public:
     
     void getStateInformation(juce::MemoryBlock& dest) override {
         auto state = apvts.copyState();
+        state.setProperty("uiW", uiW, nullptr);
+        state.setProperty("uiH", uiH, nullptr);
         std::unique_ptr<juce::XmlElement> xml(state.createXml());
         if (xml) dest.replaceAll(xml->createDocumentToString("", true).toRawUTF8());
     }
@@ -42,7 +43,12 @@ public:
     void setStateInformation(const void* data, int size) override {
         std::unique_ptr<juce::XmlElement> xmlState(juce::XmlDocument::parse(juce::String(static_cast<const char*>(data), size)));
         if (xmlState && xmlState->hasTagName(apvts.state.getType())) {
-            apvts.replaceState(juce::ValueTree::fromXml(*xmlState));
+            auto state = juce::ValueTree::fromXml(*xmlState);
+            uiW = (int)state.getProperty("uiW", 600);
+            uiH = (int)state.getProperty("uiH", 400);
+            state.removeProperty("uiW", nullptr);
+            state.removeProperty("uiH", nullptr);
+            apvts.replaceState(state);
         }
     }
 

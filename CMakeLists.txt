@@ -1,17 +1,15 @@
-cmake_minimum_required(VERSION 3.22)
+cmake_minimum_required(VERSION 3.20)
 project(NEBULA_FX VERSION 1.0.0 LANGUAGES CXX)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 include(FetchContent)
-set(JUCE_BUILD_EXTRAS OFF CACHE BOOL "" FORCE)
-set(JUCE_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
-
-FetchContent_Declare(JUCE 
-    GIT_REPOSITORY https://github.com/juce-framework/JUCE.git 
-    GIT_TAG 8.0.6 
-    GIT_SHALLOW TRUE)
+FetchContent_Declare(JUCE
+    GIT_REPOSITORY https://github.com/juce-framework/JUCE.git
+    GIT_TAG 8.0.6
+    GIT_SHALLOW TRUE
+)
 FetchContent_MakeAvailable(JUCE)
 
 juce_add_plugin(NEBULA_FX
@@ -26,17 +24,20 @@ juce_add_plugin(NEBULA_FX
     NEEDS_MIDI_INPUT FALSE
     NEEDS_MIDI_OUTPUT FALSE
     EDITOR_WANTS_KEYBOARD_FOCUS TRUE
-    COPY_PLUGIN_AFTER_BUILD TRUE)
+    COPY_PLUGIN_AFTER_BUILD TRUE
+)
 
 target_sources(NEBULA_FX PRIVATE Source/Plugin.cpp)
 
-target_link_libraries(NEBULA_FX PRIVATE 
-    juce::juce_audio_utils 
-    juce::juce_dsp 
+target_link_libraries(NEBULA_FX PRIVATE
+    juce::juce_audio_utils
+    juce::juce_dsp
     juce::juce_gui_extra
-    juce::juce_recommended_config_flags 
-    juce::juce_recommended_lto_flags)
+    juce::juce_recommended_config_flags
+    juce::juce_recommended_lto_flags
+)
 
-target_compile_definitions(NEBULA_FX PUBLIC 
-    JUCE_WEB_BROWSER=0 
-    JUCE_USE_CURL=0)
+target_compile_definitions(NEBULA_FX PUBLIC
+    JUCE_WEB_BROWSER=0
+    JUCE_USE_CURL=0
+)

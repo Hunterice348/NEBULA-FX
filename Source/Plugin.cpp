@@ -41,12 +41,12 @@ public:
             float* d = buf.getWritePointer(ch);
             for (int i = 0; i < buf.getNumSamples(); ++i) {
                 float in = d[i]; 
-                if (!std::isfinite(in)) in = 0.0f; // Защита от NaN
+                if (!std::isfinite(in)) in = 0.0f; 
                 float rect = std::abs(in);
                 env = (rect > th) ? (aA * (rect - env) + env) : (aR * (rect - env) + env);
                 float os = juce::jmax(0.0f, env - th);
                 float gr = juce::Decibels::gainToDecibels(1.0f - (os * slope));
-                z1 = (0.99f * z1) + (0.01f * gr); // Сглаживание
+                z1 = (0.99f * z1) + (0.01f * gr); 
                 d[i] = in * juce::Decibels::decibelsToGain(z1);
             }
         }
@@ -111,7 +111,7 @@ private:
             auto setup = [](juce::Slider& s) { 
                 s.setSliderStyle(juce::Slider::RotaryHorizontalVerticalDrag); 
                 s.setTextBoxStyle(juce::Slider::TextBoxBelow, false, 80, 20); 
-                s.setColour(juce::Slider::rotarySliderFillColourId, juce::Colour(0xFFFF0055)); // Neon Red
+                s.setColour(juce::Slider::rotarySliderFillColourId, juce::Colour(0xFFFF0055)); 
                 s.setColour(juce::Slider::rotarySliderOutlineColourId, juce::Colour(0xFF333333)); 
                 s.setColour(juce::Slider::textBoxTextColourId, juce::Colours::white); 
             };
@@ -128,24 +128,15 @@ private:
         ~Editor() override {}
         
         void paint(juce::Graphics& g) override {
-            // 1. Темный металлический фон
             g.setGradientFill(juce::ColourGradient(juce::Colour(0xFF1A1A1A), 0, 0, juce::Colour(0xFF0D0D0D), 0, (float)getHeight(), false)); 
             g.fillRect(getLocalBounds());
-            
             auto area = getLocalBounds().reduced(20);
-            
-            // 2. 3D-эффект панели через тени
             g.setDropShadow(juce::DropShadow(juce::Colours::black.withAlpha(0.7f), 12, juce::Point<int>(0, 6))); 
             g.fillRoundedRectangle(area.toFloat(), 16.0f);
-            
-            // 3. Внутренний градиент металла
             g.setGradientFill(juce::ColourGradient(juce::Colour(0xFF222222), 0, (float)area.getY(), juce::Colour(0xFF111111), 0, (float)area.getBottom(), false)); 
             g.fillRoundedRectangle(area.reduced(2).toFloat(), 14.0f);
-            
-            // 4. Неоновая акцентная линия
             g.setGradientFill(juce::ColourGradient(juce::Colour(0xFFFF0055), (float)area.getX(), 0, juce::Colour(0xFF7000FF), (float)area.getRight(), 0, false)); 
             g.fillRect(area.getX(), area.getY(), area.getWidth(), 3);
-            
             g.setColour(juce::Colours::white.withAlpha(0.8f)); 
             g.setFont(juce::Font(24.0f, juce::Font::bold)); 
             g.drawText("NEBULA FX", area.removeFromTop(60), juce::Justification::centred);
@@ -155,14 +146,10 @@ private:
             auto area = getLocalBounds().reduced(30, 80); 
             int sz = juce::jmin(120, area.getWidth() / 5 - 20), sp = (area.getWidth() - (sz * 5)) / 6;
             auto place = [&](juce::Slider& s) { s.setBounds(area.removeFromLeft(sz)); area.removeFromLeft(sp); };
-            
             place(thresh); place(ratio); place(att); place(rel); place(gain); 
-            
-            // Сохраняем текущий размер для FL Studio
             proc.uiW = getWidth(); 
             proc.uiH = getHeight();
         }
-        
     private:
         NebulaFXAudioProcessor& proc; 
         juce::Slider thresh, ratio, att, rel, gain;

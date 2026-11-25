@@ -25,9 +25,18 @@ jobs:
         run: cmake --build build --config Release --parallel 2
 
       - name: Collect Artifact
+        shell: pwsh
         run: |
           New-Item -ItemType Directory -Force "package/VST3"
-          Copy-Item -Path "build/NEBULA_FX_artefacts/Release/VST3/NEBULA FX.vst3" -Destination "package/VST3/" -Recurse -Force
+          $vst3Path = "build/NEBULA_FX_artefacts/Release/VST3/NEBULA FX.vst3"
+          if (Test-Path $vst3Path) {
+            Copy-Item -Path $vst3Path -Destination "package/VST3/" -Recurse -Force
+            Write-Host "Successfully copied VST3"
+          } else {
+            Write-Host "VST3 not found. Searching for any .vst3 files:"
+            Get-ChildItem -Path "build" -Recurse -Filter "*.vst3"
+            throw "VST3 build artifact not found!"
+          }
 
       - name: Upload
         uses: actions/upload-artifact@v4
